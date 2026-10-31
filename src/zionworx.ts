@@ -5,7 +5,8 @@
 // and each one triggers a fresh GET. So the module depends on the WebSocket's hello / welcome / ping / close codes,
 // not on the phone page's message formats. A slow poll covers anything the socket misses.
 
-export type ZwMode = 'logo' | 'blank' | 'hideText' | 'showAll'
+export type ZwMode = 'logo' | 'blank' | 'hideText' | 'goLive'
+export type ZwAlertState = 'off' | 'fadingIn' | 'live' | 'fadingOut'
 
 export interface ZwStatus {
 	api: number
@@ -22,7 +23,7 @@ export interface ZwStatus {
 	}
 	next: { item: number; title: string; type: string } | null
 	avail: {
-		showAll: boolean
+		goLive: boolean
 		hideText: boolean
 		camera: boolean
 		slides: boolean
@@ -39,8 +40,8 @@ export interface ZwStatus {
 		remainingText: string
 	}
 	elapsed: { ms: number; running: boolean; text: string }
-	countdown: { ms: number; text: string } | null
-	alerts: { main: string; stage: string }
+	countdown: { remaining: number; running: boolean; text: string } | null
+	alerts: { main: ZwAlertState; stage: ZwAlertState }
 }
 
 export interface ZwPlaylist {

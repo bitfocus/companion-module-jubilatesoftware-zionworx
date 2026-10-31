@@ -1,6 +1,6 @@
 import { InstanceBase, InstanceStatus, type SomeCompanionConfigField } from '@companion-module/base'
 import { GetConfigFields, type ModuleConfig, type ModuleSecrets } from './config.js'
-import { UpdateVariableDefinitions, type VariablesSchema } from './variables.js'
+import { playlistValues, statusValues, UpdateVariableDefinitions, type VariablesSchema } from './variables.js'
 import { UpgradeScripts } from './upgrades.js'
 import { UpdateActions, type ActionsSchema } from './actions.js'
 import { UpdateFeedbacks, type FeedbacksSchema } from './feedbacks.js'
@@ -17,12 +17,18 @@ export type ModuleSchema = {
 
 export { UpgradeScripts }
 
+const cTickMs = 250 // the clocks change once a second; a quarter keeps them within a quarter of ZionWorx's
+
 export default class ModuleInstance extends InstanceBase<ModuleSchema> {
 	config!: ModuleConfig // Setup in init()
 	secrets!: ModuleSecrets
 	client: ZionWorxClient | null = null
 	status: ZwStatus | null = null
 	playlist: ZwPlaylist | null = null
+	private statusAt = 0
+	private definedItems = 0
+	private sent: Partial<VariablesSchema> = {}
+	private tickTimer: NodeJS.Timeout | null = null
 
 	constructor(internal: unknown) {
 		super(internal)
@@ -38,9 +44,12 @@ export default class ModuleInstance extends InstanceBase<ModuleSchema> {
 		this.updateVariableDefinitions() // export variable definitions
 
 		this.startClient()
+		this.tickTimer = setInterval(() => this.sendVariables(), cTickMs)
 	}
 	// When module gets deleted
 	async destroy(): Promise<void> {
+		if (this.tickTimer) clearInterval(this.tickTimer)
+		this.tickTimer = null
 		this.client?.stop()
 		this.client = null
 	}
@@ -69,13 +78,50 @@ export default class ModuleInstance extends InstanceBase<ModuleSchema> {
 	}
 
 	updateVariableDefinitions(): void {
-		UpdateVariableDefinitions(this)
+		UpdateVariableDefinitions(this, this.definedItems)
+	}
+
+	private onStatus(status: ZwStatus | null): void {
+		this.status = status
+		this.statusAt = Date.now()
+		this.checkFeedbacks('mode', 'camera', 'liveItem', 'liveSlide', 'mediaPlaying', 'alert', 'unavailable')
+		this.sendVariables()
+	}
+
+	private onPlaylist(playlist: ZwPlaylist): void {
+		this.playlist = playlist
+		if (playlist.count !== this.definedItems) {
+			this.definedItems = playlist.count
+			this.updateVariableDefinitions()
+		}
+		this.sendVariables()
+	}
+
+	/** Sends the variables whose values changed, with the times moved on to now. */
+	private sendVariables(): void {
+		const values: Partial<VariablesSchema> = {
+			...playlistValues(this.playlist),
+			...statusValues(this.status, Date.now() - this.statusAt),
+		}
+		const changed: Partial<VariablesSchema> = {}
+		let any = false
+		for (const [id, value] of Object.entries(values) as [
+			keyof VariablesSchema,
+			VariablesSchema[keyof VariablesSchema],
+		][]) {
+			if (this.sent[id] !== value) {
+				changed[id] = value as never
+				this.sent[id] = value as never
+				any = true
+			}
+		}
+		if (any) this.setVariableValues(changed)
 	}
 
 	private startClient(): void {
 		this.client?.stop()
 		this.client = null
-		this.status = null
+		this.onStatus(null)
 		this.playlist = null
 
 		const host = (this.config.host ?? '').trim()
@@ -92,18 +138,16 @@ export default class ModuleInstance extends InstanceBase<ModuleSchema> {
 		this.updateStatus(InstanceStatus.Connecting)
 		this.client = new ZionWorxClient(host, this.config.port, token, `companion-${this.id}`, {
 			state: (state) => this.onState(state),
-			status: (status) => {
-				this.status = status
-			},
-			playlist: (playlist) => {
-				this.playlist = playlist
-			},
+			status: (status) => this.onStatus(status),
+			playlist: (playlist) => this.onPlaylist(playlist),
 			log: (level, message) => this.log(level, message),
 		})
 		this.client.start()
 	}
 
 	private onState(state: ZwConnectionState): void {
+		// Not connected: feedbacks go dark / grey; the variables keep their last values.
+		if (state.kind !== 'ok' && this.status) this.onStatus(null)
 		switch (state.kind) {
 			case 'connecting':
 				this.updateStatus(InstanceStatus.Connecting)

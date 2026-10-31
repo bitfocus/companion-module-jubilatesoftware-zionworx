@@ -9,7 +9,7 @@ type Step = 'next' | 'prev' | 'number'
 export type ActionsSchema = {
 	slide: { options: { step: Step; n: number } }
 	item: { options: { step: Step; n: number } }
-	mode: { options: { mode: 'logo' | 'blank' | 'hidetext' | 'showall' } }
+	mode: { options: { mode: 'logo' | 'blank' | 'hidetext' | 'golive' } }
 	camera: { options: { on: 'on' | 'off' } }
 	media: { options: { command: 'playpause' | 'restart' | 'rewind' | 'forward' } }
 }
@@ -111,9 +111,9 @@ export function UpdateActions(self: ModuleInstance): void {
 						{ id: 'logo', label: 'Logo' },
 						{ id: 'blank', label: 'Blank' },
 						{ id: 'hidetext', label: 'Hide Text' },
-						{ id: 'showall', label: 'Show All' },
+						{ id: 'golive', label: 'Go Live' },
 					],
-					default: 'showall',
+					default: 'golive',
 				},
 			],
 			callback: async ({ options }) => send(`mode/${options.mode}`, 'Output mode'),
