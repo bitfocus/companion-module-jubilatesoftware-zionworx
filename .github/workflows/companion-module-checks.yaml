@@ -10,6 +10,7 @@ jobs:
     if: ${{ !contains(github.repository, 'companion-module-template-') }}
 
     permissions:
+      contents: read # needed to check out a private repository
       packages: read
 
     uses: bitfocus/actions/.github/workflows/module-checks.yaml@main
