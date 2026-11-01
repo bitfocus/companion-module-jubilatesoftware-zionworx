@@ -84,7 +84,7 @@ export default class ModuleInstance extends InstanceBase<ModuleSchema> {
 	private onStatus(status: ZwStatus | null): void {
 		this.status = status
 		this.statusAt = Date.now()
-		this.checkFeedbacks('mode', 'camera', 'liveItem', 'liveSlide', 'mediaPlaying', 'alert', 'unavailable')
+		this.checkFeedbacks('mode', 'camera', 'liveItem', 'liveSlide', 'mediaPlaying', 'muted', 'alert', 'unavailable')
 		this.sendVariables()
 	}
 

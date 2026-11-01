@@ -12,11 +12,13 @@ export type FeedbacksSchema = {
 	liveItem: { type: 'boolean'; options: { n: number } }
 	liveSlide: { type: 'boolean'; options: { n: number } }
 	mediaPlaying: { type: 'boolean'; options: Record<string, never> }
+	muted: { type: 'boolean'; options: Record<string, never> }
 	alert: { type: 'boolean'; options: { which: 'main' | 'stage' } }
 	unavailable: { type: 'boolean'; options: { control: AvailKey } }
 }
 
 const cLit = { bgcolor: combineRgb(0, 140, 0), color: combineRgb(255, 255, 255) }
+const cMuted = { bgcolor: combineRgb(180, 0, 0), color: combineRgb(255, 255, 255) }
 const cGreyedOut = { color: combineRgb(90, 90, 90), bgcolor: combineRgb(0, 0, 0) }
 
 export function UpdateFeedbacks(self: ModuleInstance): void {
@@ -93,6 +95,13 @@ export function UpdateFeedbacks(self: ModuleInstance): void {
 			options: [],
 			callback: () => self.status?.media.playing === true,
 		},
+		muted: {
+			type: 'boolean',
+			name: 'Media is muted',
+			defaultStyle: cMuted,
+			options: [],
+			callback: () => self.status?.avail.volume === true && self.status.media.muted === true,
+		},
 		alert: {
 			type: 'boolean',
 			name: 'Alert is showing',
@@ -133,6 +142,7 @@ export function UpdateFeedbacks(self: ModuleInstance): void {
 						{ id: 'playPause', label: 'Play / Pause' },
 						{ id: 'seek', label: 'Rewind / Forward' },
 						{ id: 'restart', label: 'Restart' },
+						{ id: 'volume', label: 'Volume / Mute' },
 					],
 					default: 'slides',
 				},

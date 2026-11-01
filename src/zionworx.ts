@@ -30,6 +30,7 @@ export interface ZwStatus {
 		playPause: boolean
 		seek: boolean
 		restart: boolean
+		volume?: boolean // added 2026-11-01: absent from Beta 6 and earlier
 	}
 	media: {
 		playing: boolean
@@ -38,6 +39,8 @@ export interface ZwStatus {
 		remaining: number
 		positionText: string
 		remainingText: string
+		volume?: number // percent; absent from Beta 6 and earlier
+		muted?: boolean
 	}
 	elapsed: { ms: number; running: boolean; text: string }
 	countdown: { remaining: number; running: boolean; text: string } | null

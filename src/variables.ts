@@ -26,6 +26,9 @@ export type VariablesSchema = {
 	media_remaining: string
 	media_duration: string
 	media_remaining_s: number
+	volume: number
+	volume_text: string
+	muted: boolean
 	elapsed: string
 	elapsed_s: number
 	countdown: string
@@ -64,6 +67,9 @@ export function statusValues(status: ZwStatus | null, ageMs: number): Partial<Va
 	const remaining = Math.max(0, media.duration - position)
 	const elapsedMs = elapsed.ms + (elapsed.running ? ageMs : 0)
 	const countdownMs = countdown ? Math.max(0, countdown.remaining - (countdown.running ? ageMs : 0)) : 0
+	const hasVolume = status.avail.volume === true
+	const volume = hasVolume ? (media.volume ?? 0) : 0
+	const muted = hasVolume && media.muted === true
 
 	return {
 		playlist_title: status.playlist.title,
@@ -86,6 +92,9 @@ export function statusValues(status: ZwStatus | null, ageMs: number): Partial<Va
 		media_remaining: clockText(remaining, true),
 		media_duration: clockText(media.duration, false),
 		media_remaining_s: Math.ceil(remaining / 1000),
+		volume,
+		volume_text: !hasVolume ? '' : muted ? 'Muted' : `${volume}%`,
+		muted,
 		elapsed: clockText(elapsedMs, false),
 		elapsed_s: Math.floor(elapsedMs / 1000),
 		countdown: countdown ? clockText(countdownMs, true) : '',
@@ -124,6 +133,9 @@ export function UpdateVariableDefinitions(self: ModuleInstance, itemCount = 0): 
 		media_remaining: { name: 'Media time left (mm:ss)' },
 		media_duration: { name: 'Media duration (mm:ss)' },
 		media_remaining_s: { name: 'Media time left in seconds' },
+		volume: { name: 'Live video / audio volume in percent (0: none live)' },
+		volume_text: { name: 'Live video / audio volume as "55%", or "Muted" (empty: none live)' },
+		muted: { name: 'Live video / audio muted' },
 		elapsed: { name: 'Time since the live item went live (mm:ss)' },
 		elapsed_s: { name: 'Time since the live item went live in seconds' },
 		countdown: { name: 'Countdown time left (mm:ss; empty when no countdown is live)' },

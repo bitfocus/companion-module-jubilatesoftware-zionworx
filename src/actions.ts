@@ -12,6 +12,8 @@ export type ActionsSchema = {
 	mode: { options: { mode: 'logo' | 'blank' | 'hidetext' | 'golive' } }
 	camera: { options: { on: 'on' | 'off' } }
 	media: { options: { command: 'playpause' | 'restart' | 'rewind' | 'forward' } }
+	volume: { options: { step: 'up' | 'down' | 'set'; n: number } }
+	mute: { options: { mute: 'toggle' | 'mute' | 'unmute' } }
 }
 
 const cErrors: Record<string, string> = {
@@ -19,6 +21,7 @@ const cErrors: Record<string, string> = {
 	unavailable: 'not possible now (no slides, slides still loading, nothing to play…)',
 	stale: 'the live item changed while the command was on its way',
 	unreachable: 'ZionWorx is not reachable',
+	unknownEndpoint: 'this ZionWorx is too old for that command; update ZionWorx',
 }
 
 function numberField(what: string): CompanionInputFieldNumber<'n'> {
@@ -152,6 +155,62 @@ export function UpdateActions(self: ModuleInstance): void {
 				},
 			],
 			callback: async ({ options }) => send(`media/${options.command}`, 'Media'),
+		},
+		volume: {
+			name: 'Volume',
+			description:
+				'The live video / audio item’s own volume, as its volume bar (saved with the item). Up / down move in steps of 5 %. Changing it unmutes',
+			options: [
+				{
+					id: 'step',
+					type: 'dropdown',
+					label: 'Change',
+					choices: [
+						{ id: 'up', label: 'Up' },
+						{ id: 'down', label: 'Down' },
+						{ id: 'set', label: 'Set to…' },
+					],
+					default: 'up',
+					disableAutoExpression: true,
+				},
+				{
+					id: 'n',
+					type: 'number',
+					label: 'Volume (%)',
+					description: '0 to 100. Switch to an expression to use a variable',
+					default: 100,
+					min: 0,
+					max: 100,
+					asInteger: true,
+					isVisibleExpression: `$(options:step) == 'set'`,
+				},
+			],
+			callback: async ({ options }) => {
+				if (options.step !== 'set') return send(`audio/${options.step}`, 'Volume')
+				const n = Math.round(Number(options.n))
+				return send(Number.isFinite(n) && n >= 0 && n <= 100 ? `audio/${n}` : null, 'Volume')
+			},
+		},
+		mute: {
+			name: 'Mute',
+			description: 'Mutes the live video / audio item (not saved: the next item starts unmuted)',
+			options: [
+				{
+					id: 'mute',
+					type: 'dropdown',
+					label: 'Mute',
+					choices: [
+						{ id: 'toggle', label: 'Toggle' },
+						{ id: 'mute', label: 'Mute' },
+						{ id: 'unmute', label: 'Unmute' },
+					],
+					default: 'toggle',
+				},
+			],
+			callback: async ({ options }) => {
+				const mute = options.mute === 'toggle' ? !self.status?.media.muted : options.mute === 'mute'
+				return send(mute ? 'audio/mute' : 'audio/unmute', 'Mute')
+			},
 		},
 	})
 }
