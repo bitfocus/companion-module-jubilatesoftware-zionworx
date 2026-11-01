@@ -1,5 +1,7 @@
 ## ZionWorx
 
+![ZionWorx](images/zionworx.png)
+
 Controls ZionWorx 5 (Jubilate Software) over its control API on your local network: slides, playlist items, the
 output mode (Logo, Blank, Hide Text, Go Live), the camera background, media and volume. Buttons light up from what
 ZionWorx is showing, and they can show the live title, slide, times and more.
