@@ -84,12 +84,23 @@ export default class ModuleInstance extends InstanceBase<ModuleSchema> {
 	private onStatus(status: ZwStatus | null): void {
 		this.status = status
 		this.statusAt = Date.now()
-		this.checkFeedbacks('mode', 'camera', 'liveItem', 'liveSlide', 'mediaPlaying', 'muted', 'alert', 'unavailable')
+		this.checkFeedbacks(
+			'mode',
+			'camera',
+			'liveItem',
+			'itemUnavailable',
+			'liveSlide',
+			'mediaPlaying',
+			'muted',
+			'alert',
+			'unavailable',
+		)
 		this.sendVariables()
 	}
 
 	private onPlaylist(playlist: ZwPlaylist): void {
 		this.playlist = playlist
+		this.checkFeedbacks('itemUnavailable')
 		if (playlist.count !== this.definedItems) {
 			this.definedItems = playlist.count
 			this.updateVariableDefinitions()

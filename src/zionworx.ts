@@ -50,7 +50,8 @@ export interface ZwStatus {
 export interface ZwPlaylist {
 	title: string
 	count: number
-	items: { n: number; title: string; type: string; live: boolean }[]
+	// available: false when the item can't go live (song or file missing); absent from Beta 6 and earlier.
+	items: { n: number; title: string; type: string; live: boolean; available?: boolean }[]
 }
 
 export type ZwConnectionState =

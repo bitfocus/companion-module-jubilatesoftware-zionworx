@@ -10,6 +10,7 @@ export type FeedbacksSchema = {
 	mode: { type: 'boolean'; options: { mode: ZwMode } }
 	camera: { type: 'boolean'; options: Record<string, never> }
 	liveItem: { type: 'boolean'; options: { n: number } }
+	itemUnavailable: { type: 'boolean'; options: { n: number } }
 	liveSlide: { type: 'boolean'; options: { n: number } }
 	mediaPlaying: { type: 'boolean'; options: Record<string, never> }
 	muted: { type: 'boolean'; options: Record<string, never> }
@@ -69,6 +70,30 @@ export function UpdateFeedbacks(self: ModuleInstance): void {
 				},
 			],
 			callback: ({ options }) => (live()?.item ?? 0) > 0 && live()?.item === Math.round(Number(options.n)),
+		},
+		itemUnavailable: {
+			type: 'boolean',
+			name: 'Playlist item is unavailable (grey out)',
+			description:
+				'True when the item’s song or file is missing (ZionWorx greys it out and it can’t go live), there is no such item, or ZionWorx is not connected',
+			defaultStyle: cGreyedOut,
+			options: [
+				{
+					id: 'n',
+					type: 'number',
+					label: 'Item number',
+					description: 'Numbered from 1, as in the "Playlist item" action',
+					default: 1,
+					min: 1,
+					max: 9999,
+					asInteger: true,
+				},
+			],
+			callback: ({ options }) => {
+				if (!self.status) return true
+				const item = self.playlist?.items[Math.round(Number(options.n)) - 1]
+				return !item || item.available === false
+			},
 		},
 		liveSlide: {
 			type: 'boolean',

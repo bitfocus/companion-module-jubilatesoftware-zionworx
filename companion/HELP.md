@@ -24,7 +24,7 @@ The quickest start: drag buttons from **Presets → ZionWorx**.
 
 - **Slides**: previous / next, the live slide ("3/9" and the song section), and slides 1-10 (lit while live).
 - **Playlist items**: previous / next, the live and next titles, and items 1-20 showing their titles (lit while
-  live).
+  live, greyed out when the item is unavailable).
 - **Output**: Logo, Blank, Hide Text and Go Live, lit while showing, and the camera background.
 - **Media**: Play / Pause with the time left (lit while playing), Restart, Rewind, Forward, and a time display.
 - **Volume**: a dial for surfaces with encoders (turn for volume, push to mute), volume up / down and mute.
@@ -35,15 +35,15 @@ is not connected.
 
 ### Actions
 
-| Action            | Does                                                                                                                                                                  |
-| ----------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Slide             | Next, previous, or a slide number (from 1) of the live item                                                                                                           |
-| Playlist item     | Next, previous, or an item number (from 1) goes live. Next with nothing live: the first item                                                                          |
-| Output mode       | Logo, Blank, Hide Text or Go Live. It **sets** the mode: pressing again does nothing, so a button never toggles back                                                  |
-| Camera background | On or off                                                                                                                                                             |
-| Media transport   | Play / Pause, Restart, Rewind, Forward on the live video or audio                                                                                                     |
-| Volume            | Up / down in steps of 5 %, or set to a percentage. The live video or audio item's own volume, saved with the item, as its volume bar in ZionWorx. Changing it unmutes |
-| Mute              | Toggle, mute or unmute the live video or audio. Not saved: the next item starts unmuted                                                                               |
+| Action            | Does                                                                                                                                                                                             |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Slide             | Next, previous, or a slide number (from 1) of the live item                                                                                                                                      |
+| Playlist item     | Next, previous, or an item number (from 1) goes live. Next with nothing live: the first item. Next and previous skip unavailable items (song or file missing, greyed out in ZionWorx's playlist) |
+| Output mode       | Logo, Blank, Hide Text or Go Live. It **sets** the mode: pressing again does nothing, so a button never toggles back                                                                             |
+| Camera background | On or off                                                                                                                                                                                        |
+| Media transport   | Play / Pause, Restart, Rewind, Forward on the live video or audio                                                                                                                                |
+| Volume            | Up / down in steps of 5 %, or set to a percentage. The live video or audio item's own volume, saved with the item, as its volume bar in ZionWorx. Changing it unmutes                            |
+| Mute              | Toggle, mute or unmute the live video or audio. Not saved: the next item starts unmuted                                                                                                          |
 
 Slide and item numbers, and the volume, accept a variable: switch the field to an expression.
 
@@ -52,16 +52,17 @@ connection's log; the button does nothing.
 
 ### Feedbacks
 
-| Feedback                          | True when                                                                      |
-| --------------------------------- | ------------------------------------------------------------------------------ |
-| Output mode is…                   | The mode is showing                                                            |
-| Camera background is on           |                                                                                |
-| Playlist item is live             | Item _n_ is live                                                               |
-| Slide is live                     | Slide _n_ of the live item is showing                                          |
-| Media is playing                  | The live video or audio is playing                                             |
-| Media is muted                    | The live video or audio is muted                                               |
-| Alert is showing                  | The main or stage alert is fading in, showing or fading out                    |
-| Control is unavailable (grey out) | The control makes no sense for the live item now, or ZionWorx is not connected |
+| Feedback                                | True when                                                                                                |
+| --------------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| Output mode is…                         | The mode is showing                                                                                      |
+| Camera background is on                 |                                                                                                          |
+| Playlist item is live                   | Item _n_ is live                                                                                         |
+| Playlist item is unavailable (grey out) | Item _n_ can't go live (its song or file is missing), there is no item _n_, or ZionWorx is not connected |
+| Slide is live                           | Slide _n_ of the live item is showing                                                                    |
+| Media is playing                        | The live video or audio is playing                                                                       |
+| Media is muted                          | The live video or audio is muted                                                                         |
+| Alert is showing                        | The main or stage alert is fading in, showing or fading out                                              |
+| Control is unavailable (grey out)       | The control makes no sense for the live item now, or ZionWorx is not connected                           |
 
 ### Variables
 

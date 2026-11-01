@@ -144,7 +144,10 @@ export function UpdatePresets(self: ModuleInstance): void {
 				keywords: ['item', 'playlist'],
 				style: style(`${n}. ${v(`item_${n}_title`)}`, '14'),
 				steps: press([{ actionId: 'item', options: { step: 'number', n } }]),
-				feedbacks: [{ feedbackId: 'liveItem', options: { n }, style: cGreen }],
+				feedbacks: [
+					{ feedbackId: 'liveItem', options: { n }, style: cGreen },
+					{ feedbackId: 'itemUnavailable', options: { n }, style: cGreyedOut },
+				],
 			}),
 		)
 
