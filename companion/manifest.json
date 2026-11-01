@@ -4,7 +4,7 @@
 	"id": "jubilatesoftware-zionworx",
 	"name": "jubilatesoftware-zionworx",
 	"shortname": "zionworx",
-	"description": "Control ZionWorx 5 church presentation software: slides, items, logo/blank/hide text, media and status",
+	"description": "Control ZionWorx 5 church presentation software: slides, items, logo/blank/hide text/go live, media, volume and status",
 	"version": "0.0.0",
 	"license": "MIT",
 	"repository": "git+https://github.com/bitfocus/companion-module-jubilatesoftware-zionworx.git",
