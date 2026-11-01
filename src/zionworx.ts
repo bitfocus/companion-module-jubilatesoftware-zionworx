@@ -78,6 +78,17 @@ const cRetryMinMs = 1000
 const cRetryMaxMs = 30000
 const cRefreshDelayMs = 30 // gathers a burst of pushes into one GET
 
+/**
+ * Builds before the Show All -> Go Live rename (Beta 6 and earlier) report mode 'showAll' and avail.showAll.
+ * TODO: remove (with the mode/showall fallback in command) once testers run a build with the rename.
+ */
+function goLiveNames(status: ZwStatus): ZwStatus {
+	const old = status as ZwStatus & { avail: { showAll?: boolean } }
+	if ((status.live.mode as string) === 'showAll') status.live.mode = 'goLive'
+	if (status.avail.goLive === undefined && old.avail.showAll !== undefined) status.avail.goLive = old.avail.showAll
+	return status
+}
+
 export class ZionWorxClient {
 	private ws: WebSocket | null = null
 	private stopped = true
@@ -125,7 +136,9 @@ export class ZionWorxClient {
 
 	/** POST a command, e.g. 'slide/next' or 'item/3'. */
 	async command(path: string): Promise<ZwCommandResult> {
-		const res = await this.request('POST', path)
+		let res = await this.request('POST', path)
+		// Builds before the Show All -> Go Live rename (Beta 6 and earlier) know only mode/showall. TODO: remove later.
+		if (res?.status === 404 && path === 'mode/golive') res = await this.request('POST', 'mode/showall')
 		if (!res) return { ok: false, status: 0, err: 'unreachable' }
 		const body = (await res.json().catch(() => ({}))) as { ok?: boolean; err?: string }
 		if (res.ok) this.scheduleRefresh(false)
@@ -260,7 +273,7 @@ export class ZionWorxClient {
 				const withPlaylist = this.refreshPlaylist
 				this.refreshPlaylist = false
 				const status = await this.getJson<ZwStatus>('status')
-				if (status) this.events.status(status)
+				if (status) this.events.status(goLiveNames(status))
 				if (withPlaylist) {
 					const playlist = await this.getJson<ZwPlaylist>('playlist')
 					if (playlist) this.events.playlist(playlist)
