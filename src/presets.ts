@@ -24,7 +24,8 @@ const cGreen = { bgcolor: combineRgb(0, 140, 0), color: cWhite }
 const cRed = { bgcolor: combineRgb(180, 0, 0), color: cWhite }
 const cAmber = { bgcolor: combineRgb(200, 120, 0), color: cWhite }
 const cGreyedOut = { color: combineRgb(90, 90, 90), bgcolor: cBlack }
-const cDisplayBlue = combineRgb(0, 60, 140)
+const cDisplayBlue = combineRgb(0, 90, 200)
+const cCueBlue = combineRgb(0, 40, 95)
 const cDisplayGrey = combineRgb(48, 48, 48)
 
 // How many numbered slide and item buttons to offer.
@@ -130,7 +131,7 @@ export function UpdatePresets(self: ModuleInstance): void {
 			type: 'simple',
 			name: 'Next item title (press: next item)',
 			keywords: ['item', 'title', 'next', 'cue'],
-			style: style(`Next:\n${v('next_title')}`, '14', cDisplayGrey),
+			style: style(`Next:\n${v('next_title')}`, '14', cCueBlue),
 			steps: press([{ actionId: 'item', options: { step: 'next', n: 1 } }]),
 			feedbacks: [],
 		}),
@@ -209,7 +210,7 @@ export function UpdatePresets(self: ModuleInstance): void {
 			type: 'simple',
 			name: 'Play / Pause (shows the time left)',
 			keywords: ['media', 'video', 'audio', 'play', 'pause'],
-			style: style(`Play/Pause\n${v('media_remaining')}`, '14'),
+			style: style(`Play\nPause\n${v('media_remaining')}`, '14'),
 			steps: press([{ actionId: 'media', options: { command: 'playpause' } }]),
 			feedbacks: [{ feedbackId: 'mediaPlaying', options: {}, style: cGreen }, greyedOut('playPause')],
 		}),
