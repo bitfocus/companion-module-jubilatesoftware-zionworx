@@ -48,7 +48,7 @@ function press(down: Step['down']): Step[] {
 }
 
 function greyedOut(
-	control: 'slides' | 'goLive' | 'hideText' | 'camera' | 'playPause' | 'seek' | 'restart' | 'volume',
+	control: 'slides' | 'goLive' | 'hideText' | 'camera' | 'playPause' | 'seek' | 'restart' | 'volume' | 'autoAdvance',
 ): Feedback {
 	return { feedbackId: 'unavailable', options: { control }, style: cGreyedOut }
 }
@@ -86,6 +86,14 @@ export function UpdatePresets(self: ModuleInstance): void {
 			style: style(`Slide\n${v('live_slide_of')}\n${v('live_label')}`, '14', cDisplayBlue),
 			steps: press([{ actionId: 'slide', options: { step: 'next', n: 1 } }]),
 			feedbacks: [],
+		}),
+		add('autoAdvance', {
+			type: 'simple',
+			name: 'Auto-advance play / pause (image show, timed PowerPoint)',
+			keywords: ['slide', 'auto', 'advance', 'timer', 'image', 'show', 'powerpoint', 'play', 'pause'],
+			style: style('Auto\nAdvance', '14'),
+			steps: press([{ actionId: 'autoAdvance', options: { command: 'playpause' } }]),
+			feedbacks: [{ feedbackId: 'autoAdvancing', options: {}, style: cGreen }, greyedOut('autoAdvance')],
 		}),
 	]
 	const slideNumbers: string[] = []
@@ -208,7 +216,7 @@ export function UpdatePresets(self: ModuleInstance): void {
 	const media = [
 		add('mediaPlayPause', {
 			type: 'simple',
-			name: 'Play / Pause (shows the time left)',
+			name: 'Play / Pause (shows the time left; a video, audio item or backing track)',
 			keywords: ['media', 'video', 'audio', 'play', 'pause'],
 			style: style(`Play\nPause\n${v('media_remaining')}`, '14'),
 			steps: press([{ actionId: 'media', options: { command: 'playpause' } }]),

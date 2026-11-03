@@ -14,6 +14,7 @@ export type ActionsSchema = {
 	media: { options: { command: 'playpause' | 'restart' | 'rewind' | 'forward' } }
 	volume: { options: { step: 'up' | 'down' | 'set'; n: number } }
 	mute: { options: { mute: 'toggle' | 'mute' | 'unmute' } }
+	autoAdvance: { options: { command: 'playpause' | 'play' | 'pause' } }
 }
 
 const cErrors: Record<string, string> = {
@@ -139,7 +140,8 @@ export function UpdateActions(self: ModuleInstance): void {
 		},
 		media: {
 			name: 'Media transport',
-			description: 'Video / audio of the live item',
+			description:
+				'The live item’s media: a video or audio item’s own, else the audio attached to the item (a song’s backing track, an image show’s soundtrack)',
 			options: [
 				{
 					id: 'command',
@@ -159,7 +161,7 @@ export function UpdateActions(self: ModuleInstance): void {
 		volume: {
 			name: 'Volume',
 			description:
-				'The live video / audio item’s own volume, as its volume bar (saved with the item). Up / down move in steps of 5 %. Changing it unmutes',
+				'The live item’s volume, as its volume bar (saved with the item): its attached audio’s where it has some, else a video or audio item’s own. Up / down move in steps of 5 %. Changing it unmutes',
 			options: [
 				{
 					id: 'step',
@@ -193,7 +195,8 @@ export function UpdateActions(self: ModuleInstance): void {
 		},
 		mute: {
 			name: 'Mute',
-			description: 'Mutes the live video / audio item (not saved: the next item starts unmuted)',
+			description:
+				'Mutes the live item’s audio, as the Volume action picks it (not saved: the next item starts unmuted)',
 			options: [
 				{
 					id: 'mute',
@@ -211,6 +214,25 @@ export function UpdateActions(self: ModuleInstance): void {
 				const mute = options.mute === 'toggle' ? !self.status?.media.muted : options.mute === 'mute'
 				return send(mute ? 'audio/mute' : 'audio/unmute', 'Mute')
 			},
+		},
+		autoAdvance: {
+			name: 'Auto-advance: play / pause',
+			description:
+				'The live item’s slide timer: an image show with Auto Advance on, a PowerPoint using its slide timings. Separate from its media, so pictures and their soundtrack can be paused apart',
+			options: [
+				{
+					id: 'command',
+					type: 'dropdown',
+					label: 'Command',
+					choices: [
+						{ id: 'playpause', label: 'Play / Pause' },
+						{ id: 'play', label: 'Play' },
+						{ id: 'pause', label: 'Pause' },
+					],
+					default: 'playpause',
+				},
+			],
+			callback: async ({ options }) => send(`autoadvance/${options.command}`, 'Auto-advance'),
 		},
 	})
 }

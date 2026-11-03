@@ -29,6 +29,12 @@ export type VariablesSchema = {
 	volume: number
 	volume_text: string
 	muted: boolean
+	attached_playing: boolean
+	attached_position: string
+	attached_remaining: string
+	attached_duration: string
+	attached_remaining_s: number
+	auto_advancing: boolean
 	elapsed: string
 	elapsed_s: number
 	countdown: string
@@ -65,6 +71,12 @@ export function statusValues(status: ZwStatus | null, ageMs: number): Partial<Va
 		media.duration > 0 ? media.duration : Infinity,
 	)
 	const remaining = Math.max(0, media.duration - position)
+	const attached = status.attachedMedia
+	const attachedPosition = attached
+		? Math.min(attached.position + (attached.playing ? ageMs : 0), attached.duration > 0 ? attached.duration : Infinity)
+		: 0
+	const attachedRemaining = attached ? Math.max(0, attached.duration - attachedPosition) : 0
+	const hasAttached = (attached?.duration ?? 0) > 0
 	const elapsedMs = elapsed.ms + (elapsed.running ? ageMs : 0)
 	const countdownMs = countdown ? Math.max(0, countdown.remaining - (countdown.running ? ageMs : 0)) : 0
 	const hasVolume = status.avail.volume === true
@@ -95,6 +107,12 @@ export function statusValues(status: ZwStatus | null, ageMs: number): Partial<Va
 		volume,
 		volume_text: !hasVolume ? '' : muted ? 'Muted' : `${volume}%`,
 		muted,
+		attached_playing: attached?.playing ?? false,
+		attached_position: hasAttached ? clockText(attachedPosition, false) : '',
+		attached_remaining: hasAttached ? clockText(attachedRemaining, true) : '',
+		attached_duration: hasAttached && attached ? clockText(attached.duration, false) : '',
+		attached_remaining_s: Math.ceil(attachedRemaining / 1000),
+		auto_advancing: status.avail.autoAdvance === true && status.autoAdvance?.running === true,
 		elapsed: clockText(elapsedMs, false),
 		elapsed_s: Math.floor(elapsedMs / 1000),
 		countdown: countdown ? clockText(countdownMs, true) : '',
@@ -128,14 +146,20 @@ export function UpdateVariableDefinitions(self: ModuleInstance, itemCount = 0): 
 		next_item: { name: 'Next item number (0: end of playlist)' },
 		next_title: { name: 'Next item title' },
 		next_type: { name: 'Next item type' },
-		media_playing: { name: 'Media playing' },
+		media_playing: { name: 'Media playing (a video / audio item, else attached audio)' },
 		media_position: { name: 'Media position (mm:ss)' },
 		media_remaining: { name: 'Media time left (mm:ss)' },
 		media_duration: { name: 'Media duration (mm:ss)' },
 		media_remaining_s: { name: 'Media time left in seconds' },
-		volume: { name: 'Live video / audio volume in percent (0: none live)' },
-		volume_text: { name: 'Live video / audio volume as "55%", or "Muted" (empty: none live)' },
-		muted: { name: 'Live video / audio muted' },
+		volume: { name: 'Live item volume in percent (attached audio, else its own; 0: none)' },
+		volume_text: { name: 'Live item volume as "55%", or "Muted" (empty: none)' },
+		muted: { name: 'Live item audio muted' },
+		attached_playing: { name: 'Attached audio playing' },
+		attached_position: { name: 'Attached audio position (mm:ss; empty: none)' },
+		attached_remaining: { name: 'Attached audio time left (mm:ss; empty: none)' },
+		attached_duration: { name: 'Attached audio duration (mm:ss; empty: none)' },
+		attached_remaining_s: { name: 'Attached audio time left in seconds' },
+		auto_advancing: { name: 'Auto-advance running (image show / timed PowerPoint)' },
 		elapsed: { name: 'Time since the live item went live (mm:ss)' },
 		elapsed_s: { name: 'Time since the live item went live in seconds' },
 		countdown: { name: 'Countdown time left (mm:ss; empty when no countdown is live)' },

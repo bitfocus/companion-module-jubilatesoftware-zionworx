@@ -31,7 +31,12 @@ export interface ZwStatus {
 		seek: boolean
 		restart: boolean
 		volume?: boolean // added 2026-11-01: absent from Beta 6 and earlier
+		autoAdvance?: boolean // added 2026-11-02: absent from Beta 6 and earlier
 	}
+	// The live item's slide timer (image show auto-advance, PowerPoint slide timings); absent from Beta 6 and earlier.
+	autoAdvance?: { running: boolean }
+	// What the media commands act on: a video or audio item's own media, else the item's attached audio (a song's
+	// backing track). Beta 6 and earlier: video / audio items only.
 	media: {
 		playing: boolean
 		position: number
@@ -41,6 +46,15 @@ export interface ZwStatus {
 		remainingText: string
 		volume?: number // percent; absent from Beta 6 and earlier
 		muted?: boolean
+	}
+	// The item's attached audio alone (zeros when none); absent from Beta 6 and earlier.
+	attachedMedia?: {
+		playing: boolean
+		position: number
+		duration: number
+		remaining: number
+		positionText: string
+		remainingText: string
 	}
 	elapsed: { ms: number; running: boolean; text: string }
 	countdown: { remaining: number; running: boolean; text: string } | null

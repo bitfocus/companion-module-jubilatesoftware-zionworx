@@ -14,6 +14,8 @@ export type FeedbacksSchema = {
 	liveSlide: { type: 'boolean'; options: { n: number } }
 	mediaPlaying: { type: 'boolean'; options: Record<string, never> }
 	muted: { type: 'boolean'; options: Record<string, never> }
+	autoAdvancing: { type: 'boolean'; options: Record<string, never> }
+	attachedPlaying: { type: 'boolean'; options: Record<string, never> }
 	alert: { type: 'boolean'; options: { which: 'main' | 'stage' } }
 	unavailable: { type: 'boolean'; options: { control: AvailKey } }
 }
@@ -127,6 +129,22 @@ export function UpdateFeedbacks(self: ModuleInstance): void {
 			options: [],
 			callback: () => self.status?.avail.volume === true && self.status.media.muted === true,
 		},
+		autoAdvancing: {
+			type: 'boolean',
+			name: 'Auto-advance is running',
+			description: 'The live item’s slide timer (image show, timed PowerPoint) is running',
+			defaultStyle: cLit,
+			options: [],
+			callback: () => self.status?.avail.autoAdvance === true && self.status.autoAdvance?.running === true,
+		},
+		attachedPlaying: {
+			type: 'boolean',
+			name: 'Attached audio is playing',
+			description: 'The live item’s attached audio (a backing track) is playing',
+			defaultStyle: cLit,
+			options: [],
+			callback: () => self.status?.attachedMedia?.playing === true,
+		},
 		alert: {
 			type: 'boolean',
 			name: 'Alert is showing',
@@ -168,6 +186,7 @@ export function UpdateFeedbacks(self: ModuleInstance): void {
 						{ id: 'seek', label: 'Rewind / Forward' },
 						{ id: 'restart', label: 'Restart' },
 						{ id: 'volume', label: 'Volume / Mute' },
+						{ id: 'autoAdvance', label: 'Auto-advance' },
 					],
 					default: 'slides',
 				},
