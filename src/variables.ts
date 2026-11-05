@@ -43,6 +43,7 @@ export type VariablesSchema = {
 	alert_main: string
 	alert_stage: string
 	[item: `item_${number}_title`]: string
+	[label: `item_${number}_label`]: string
 }
 
 const cModeLabels: Record<ZwMode, string> = {
@@ -123,9 +124,18 @@ export function statusValues(status: ZwStatus | null, ageMs: number): Partial<Va
 	}
 }
 
+// The item buttons the presets offer: their variables always exist, empty with no item there, so a button past the
+// end of the playlist shows nothing rather than $NA.
+export const cItemSlots = 20
+
 export function playlistValues(playlist: ZwPlaylist | null): Partial<VariablesSchema> {
 	const values: Partial<VariablesSchema> = {}
-	for (const item of playlist?.items ?? []) values[`item_${item.n}_title`] = item.title
+	const items = playlist?.items ?? []
+	for (let n = 1; n <= Math.max(items.length, cItemSlots); n++) {
+		const title = items[n - 1]?.title ?? ''
+		values[`item_${n}_title`] = title
+		values[`item_${n}_label`] = title === '' ? '' : `${n}. ${title}`
+	}
 	return values
 }
 
@@ -142,7 +152,7 @@ export function UpdateVariableDefinitions(self: ModuleInstance, itemCount = 0): 
 		live_label: { name: 'Song section on screen ("V1", "C"…)' },
 		mode: { name: 'Output mode id (logo, blank, hideText, goLive)' },
 		mode_label: { name: 'Output mode (Logo, Blank, Hide Text, Go Live)' },
-		camera: { name: 'Camera background on' },
+		camera: { name: 'Live Camera on' },
 		next_item: { name: 'Next item number (0: end of playlist)' },
 		next_title: { name: 'Next item title' },
 		next_type: { name: 'Next item type' },
@@ -168,6 +178,9 @@ export function UpdateVariableDefinitions(self: ModuleInstance, itemCount = 0): 
 		alert_main: { name: 'Main alert (off, fadingIn, live, fadingOut)' },
 		alert_stage: { name: 'Stage alert (off, fadingIn, live, fadingOut)' },
 	}
-	for (let n = 1; n <= itemCount; n++) defs[`item_${n}_title`] = { name: `Playlist item ${n} title` }
+	for (let n = 1; n <= Math.max(itemCount, cItemSlots); n++) {
+		defs[`item_${n}_title`] = { name: `Playlist item ${n} title (empty: no item ${n})` }
+		defs[`item_${n}_label`] = { name: `Playlist item ${n} as "${n}. Title" (empty: no item ${n})` }
+	}
 	self.setVariableDefinitions(defs as CompanionVariableDefinitions<VariablesSchema>)
 }

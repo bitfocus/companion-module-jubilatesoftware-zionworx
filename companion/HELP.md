@@ -3,7 +3,7 @@
 ![ZionWorx](images/zionworx.png)
 
 Controls ZionWorx 5 (Jubilate Software) over its control API on your local network: slides, playlist items, the
-output mode (Logo, Blank, Hide Text, Go Live), the camera background, media and volume. Buttons light up from what
+output mode (Logo, Blank, Hide Text, Go Live), Live Camera, media and volume. Buttons light up from what
 ZionWorx is showing, and they can show the live title, slide, times and more.
 
 ### Setting up ZionWorx
@@ -27,8 +27,9 @@ The quickest start: drag buttons from **Presets → ZionWorx**.
 - **Slides**: previous / next, the live slide ("3/9" and the song section), slides 1-10 (lit while live), and
   Auto-advance (an image show's or timed PowerPoint's slide timer, lit while running).
 - **Playlist items**: previous / next, the live and next titles, and items 1-20 showing their titles (lit while
-  live, greyed out when the item is unavailable).
-- **Output**: Logo, Blank, Hide Text and Go Live, lit while showing, and the camera background.
+  live, greyed out when the item is unavailable, blank past the end of the playlist).
+- **Output**: Logo, Blank, Hide Text and Go Live, lit while showing, and Live Camera (on, off). Also as
+  toggles: Logo, Blank or Hide Text that go back to Go Live when pressed again, and a Live Camera toggle.
 - **Media**: Play / Pause with the time left (lit while playing), Restart, Rewind, Forward, and a time display.
   They work on a video or audio item, and on the audio attached to any item (a song's backing track, an image
   show's soundtrack).
@@ -40,16 +41,16 @@ is not connected.
 
 ### Actions
 
-| Action            | Does                                                                                                                                                                                                        |
-| ----------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Slide             | Next, previous, or a slide number (from 1) of the live item                                                                                                                                                 |
-| Playlist item     | Next, previous, or an item number (from 1) goes live. Next with nothing live: the first item. Next and previous skip unavailable items (song or file missing, greyed out in ZionWorx's playlist)            |
-| Output mode       | Logo, Blank, Hide Text or Go Live. It **sets** the mode: pressing again does nothing, so a button never toggles back                                                                                        |
-| Camera background | On or off                                                                                                                                                                                                   |
-| Media transport   | Play / Pause, Restart, Rewind, Forward on the live item's media: a video or audio item's own, else the audio attached to the item (a song's backing track)                                                  |
-| Volume            | Up / down in steps of 5 %, or set to a percentage, as the volume bar in ZionWorx (saved with the item): the attached audio's where the item has some, else a video or audio item's own. Changing it unmutes |
-| Mute              | Toggle, mute or unmute the same audio. Not saved: the next item starts unmuted                                                                                                                              |
-| Auto-advance      | Play / Pause, Play or Pause the live item's slide timer: an image show with Auto Advance on, a PowerPoint using its slide timings. Separate from its media, so pictures and soundtrack can be paused apart  |
+| Action          | Does                                                                                                                                                                                                                  |
+| --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Slide           | Next, previous, or a slide number (from 1) of the live item                                                                                                                                                           |
+| Playlist item   | Next, previous, or an item number (from 1) goes live. Next with nothing live: the first item. Next and previous skip unavailable items (song or file missing, greyed out in ZionWorx's playlist)                      |
+| Output mode     | Logo, Blank, Hide Text or Go Live. It **sets** the mode: pressing again does nothing. Tick **Toggle with Go Live** for a button that goes back to Go Live when pressed while its mode shows, however the mode was set |
+| Live Camera     | On, off or toggle (the app’s Live Camera button)                                                                                                                                                                      |
+| Media transport | Play / Pause, Restart, Rewind, Forward on the live item's media: a video or audio item's own, else the audio attached to the item (a song's backing track)                                                            |
+| Volume          | Up / down in steps of 5 %, or set to a percentage, as the volume bar in ZionWorx (saved with the item): the attached audio's where the item has some, else a video or audio item's own. Changing it unmutes           |
+| Mute            | Toggle, mute or unmute the same audio. Not saved: the next item starts unmuted                                                                                                                                        |
+| Auto-advance    | Play / Pause, Play or Pause the live item's slide timer: an image show with Auto Advance on, a PowerPoint using its slide timings. Separate from its media, so pictures and soundtrack can be paused apart            |
 
 Older ZionWorx builds (Beta 6 and earlier) control a video or audio item only, and answer the Auto-advance action
 with "too old".
@@ -64,7 +65,7 @@ connection's log; the button does nothing.
 | Feedback                                | True when                                                                                                |
 | --------------------------------------- | -------------------------------------------------------------------------------------------------------- |
 | Output mode is…                         | The mode is showing                                                                                      |
-| Camera background is on                 |                                                                                                          |
+| Live Camera is on                       |                                                                                                          |
 | Playlist item is live                   | Item _n_ is live                                                                                         |
 | Playlist item is unavailable (grey out) | Item _n_ can't go live (its song or file is missing), there is no item _n_, or ZionWorx is not connected |
 | Slide is live                           | Slide _n_ of the live item is showing                                                                    |
@@ -84,9 +85,10 @@ connection's log; the button does nothing.
 | `live_slide`, `live_slides`, `live_slide_of`                                                               | The live slide, the slide count, and both as "3/9"                                    |
 | `live_label`                                                                                               | The song section on screen ("V1", "C")                                                |
 | `mode`, `mode_label`                                                                                       | The output mode (`goLive`, "Go Live")                                                 |
-| `camera`                                                                                                   | Camera background on                                                                  |
+| Live Camera on                                                                                             |
 | `next_item`, `next_title`, `next_type`                                                                     | The item Next would put live                                                          |
-| `item_1_title`, `item_2_title`, …                                                                          | Every playlist item's title                                                           |
+| `item_1_title`, `item_2_title`, …                                                                          | Every playlist item's title (items 1-20 always exist, empty past the end)             |
+| `item_1_label`, `item_2_label`, …                                                                          | The same as "1. Title", empty past the end                                            |
 | `media_playing`, `media_position`, `media_remaining`, `media_duration`, `media_remaining_s`                | The live item's media, as Media transport picks it (mm:ss; time left also in seconds) |
 | `volume`, `volume_text`, `muted`                                                                           | The volume the Volume action sets, as "55%" or "Muted", and mute                      |
 | `attached_playing`, `attached_position`, `attached_remaining`, `attached_duration`, `attached_remaining_s` | The attached audio alone (empty when none): for a video with attached audio           |

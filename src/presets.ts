@@ -7,6 +7,7 @@ import {
 	type CompanionSimplePresetOptions,
 } from '@companion-module/base'
 import type ModuleInstance from './main.js'
+import { cItemSlots } from './variables.js'
 import type { ModuleSchema } from './main.js'
 
 // The ready-made buttons, in the sections of the old generated page (test\WebRemote\make_companion_page.py in the
@@ -30,7 +31,6 @@ const cDisplayGrey = combineRgb(48, 48, 48)
 
 // How many numbered slide and item buttons to offer.
 const cSlideButtons = 10
-const cItemButtons = 20
 
 // Companion reads rotaryActions from a preset's options, though the module types don't list it yet.
 const cRotary = { rotaryActions: true } as CompanionSimplePresetOptions
@@ -145,13 +145,13 @@ export function UpdatePresets(self: ModuleInstance): void {
 		}),
 	]
 	const itemNumbers: string[] = []
-	for (let n = 1; n <= cItemButtons; n++)
+	for (let n = 1; n <= cItemSlots; n++)
 		itemNumbers.push(
 			add(`item${n}`, {
 				type: 'simple',
 				name: `Playlist item ${n}`,
 				keywords: ['item', 'playlist'],
-				style: style(`${n}. ${v(`item_${n}_title`)}`, '14'),
+				style: style(v(`item_${n}_label`), '14'),
 				steps: press([{ actionId: 'item', options: { step: 'number', n } }]),
 				feedbacks: [
 					{ feedbackId: 'liveItem', options: { n }, style: cGreen },
@@ -167,7 +167,7 @@ export function UpdatePresets(self: ModuleInstance): void {
 			name: 'Logo',
 			keywords: ['mode', 'logo'],
 			style: style('Logo'),
-			steps: press([{ actionId: 'mode', options: { mode: 'logo' } }]),
+			steps: press([{ actionId: 'mode', options: { mode: 'logo', toggle: false } }]),
 			feedbacks: [{ feedbackId: 'mode', options: { mode: 'logo' }, style: cRed }],
 		}),
 		add('modeBlank', {
@@ -175,7 +175,7 @@ export function UpdatePresets(self: ModuleInstance): void {
 			name: 'Blank',
 			keywords: ['mode', 'blank', 'black', 'curtain'],
 			style: style('Blank'),
-			steps: press([{ actionId: 'mode', options: { mode: 'blank' } }]),
+			steps: press([{ actionId: 'mode', options: { mode: 'blank', toggle: false } }]),
 			feedbacks: [{ feedbackId: 'mode', options: { mode: 'blank' }, style: cRed }],
 		}),
 		add('modeHideText', {
@@ -183,7 +183,7 @@ export function UpdatePresets(self: ModuleInstance): void {
 			name: 'Hide Text',
 			keywords: ['mode', 'hide', 'text', 'clear'],
 			style: style('Hide\nText'),
-			steps: press([{ actionId: 'mode', options: { mode: 'hidetext' } }]),
+			steps: press([{ actionId: 'mode', options: { mode: 'hidetext', toggle: false } }]),
 			feedbacks: [{ feedbackId: 'mode', options: { mode: 'hideText' }, style: cRed }, greyedOut('hideText')],
 		}),
 		add('modeGoLive', {
@@ -191,22 +191,54 @@ export function UpdatePresets(self: ModuleInstance): void {
 			name: 'Go Live',
 			keywords: ['mode', 'go', 'live', 'show'],
 			style: style('Go\nLive'),
-			steps: press([{ actionId: 'mode', options: { mode: 'golive' } }]),
+			steps: press([{ actionId: 'mode', options: { mode: 'golive', toggle: false } }]),
 			feedbacks: [{ feedbackId: 'mode', options: { mode: 'goLive' }, style: cGreen }, greyedOut('goLive')],
 		}),
 		add('cameraOn', {
 			type: 'simple',
-			name: 'Camera background on',
+			name: 'Live Camera on',
 			keywords: ['camera', 'background'],
-			style: style('Camera\nOn'),
+			style: style('Live Cam\nOn'),
 			steps: press([{ actionId: 'camera', options: { on: 'on' } }]),
+			feedbacks: [{ feedbackId: 'camera', options: {}, style: cGreen }, greyedOut('camera')],
+		}),
+		add('modeLogoToggle', {
+			type: 'simple',
+			name: 'Logo (toggle: press again for Go Live)',
+			keywords: ['mode', 'logo', 'toggle'],
+			style: style('Logo'),
+			steps: press([{ actionId: 'mode', options: { mode: 'logo', toggle: true } }]),
+			feedbacks: [{ feedbackId: 'mode', options: { mode: 'logo' }, style: cRed }],
+		}),
+		add('modeBlankToggle', {
+			type: 'simple',
+			name: 'Blank (toggle: press again for Go Live)',
+			keywords: ['mode', 'blank', 'black', 'curtain', 'toggle'],
+			style: style('Blank'),
+			steps: press([{ actionId: 'mode', options: { mode: 'blank', toggle: true } }]),
+			feedbacks: [{ feedbackId: 'mode', options: { mode: 'blank' }, style: cRed }],
+		}),
+		add('modeHideTextToggle', {
+			type: 'simple',
+			name: 'Hide Text (toggle: press again for Go Live)',
+			keywords: ['mode', 'hide', 'text', 'clear', 'toggle'],
+			style: style('Hide\nText'),
+			steps: press([{ actionId: 'mode', options: { mode: 'hidetext', toggle: true } }]),
+			feedbacks: [{ feedbackId: 'mode', options: { mode: 'hideText' }, style: cRed }, greyedOut('hideText')],
+		}),
+		add('cameraToggle', {
+			type: 'simple',
+			name: 'Live Camera (toggle, as the app’s button)',
+			keywords: ['camera', 'live', 'background', 'toggle'],
+			style: style('Live\nCamera'),
+			steps: press([{ actionId: 'camera', options: { on: 'toggle' } }]),
 			feedbacks: [{ feedbackId: 'camera', options: {}, style: cGreen }, greyedOut('camera')],
 		}),
 		add('cameraOff', {
 			type: 'simple',
-			name: 'Camera background off',
+			name: 'Live Camera off',
 			keywords: ['camera', 'background'],
-			style: style('Camera\nOff'),
+			style: style('Live Cam\nOff'),
 			steps: press([{ actionId: 'camera', options: { on: 'off' } }]),
 			feedbacks: [greyedOut('camera')],
 		}),
@@ -374,7 +406,7 @@ export function UpdatePresets(self: ModuleInstance): void {
 		{
 			id: 'output',
 			name: 'Output',
-			description: 'The output mode (each sets its mode; pressing again does nothing) and the camera background',
+			description: 'The output mode (each sets its mode; pressing again does nothing) and Live Camera',
 			definitions: output,
 		},
 		{

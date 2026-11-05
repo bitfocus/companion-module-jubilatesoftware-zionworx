@@ -92,6 +92,8 @@ export default class ModuleInstance extends InstanceBase<ModuleSchema> {
 			'liveSlide',
 			'mediaPlaying',
 			'muted',
+			'autoAdvancing',
+			'attachedPlaying',
 			'alert',
 			'unavailable',
 		)

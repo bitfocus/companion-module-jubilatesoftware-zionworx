@@ -50,7 +50,7 @@ export function UpdateFeedbacks(self: ModuleInstance): void {
 		},
 		camera: {
 			type: 'boolean',
-			name: 'Camera background is on',
+			name: 'Live Camera is on',
 			defaultStyle: cLit,
 			options: [],
 			callback: () => live()?.camera === true,
@@ -181,7 +181,7 @@ export function UpdateFeedbacks(self: ModuleInstance): void {
 						{ id: 'slides', label: 'Slides (next / previous / go to)' },
 						{ id: 'goLive', label: 'Go Live' },
 						{ id: 'hideText', label: 'Hide Text' },
-						{ id: 'camera', label: 'Camera background' },
+						{ id: 'camera', label: 'Live Camera' },
 						{ id: 'playPause', label: 'Play / Pause' },
 						{ id: 'seek', label: 'Rewind / Forward' },
 						{ id: 'restart', label: 'Restart' },

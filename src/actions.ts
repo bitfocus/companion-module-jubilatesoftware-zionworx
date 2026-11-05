@@ -9,8 +9,8 @@ type Step = 'next' | 'prev' | 'number'
 export type ActionsSchema = {
 	slide: { options: { step: Step; n: number } }
 	item: { options: { step: Step; n: number } }
-	mode: { options: { mode: 'logo' | 'blank' | 'hidetext' | 'golive' } }
-	camera: { options: { on: 'on' | 'off' } }
+	mode: { options: { mode: 'logo' | 'blank' | 'hidetext' | 'golive'; toggle: boolean } }
+	camera: { options: { on: 'on' | 'off' | 'toggle' } }
 	media: { options: { command: 'playpause' | 'restart' | 'rewind' | 'forward' } }
 	volume: { options: { step: 'up' | 'down' | 'set'; n: number } }
 	mute: { options: { mute: 'toggle' | 'mute' | 'unmute' } }
@@ -105,7 +105,8 @@ export function UpdateActions(self: ModuleInstance): void {
 		},
 		mode: {
 			name: 'Output mode',
-			description: 'Sets the output mode; choosing the mode already showing does nothing',
+			description:
+				'Sets the output mode; choosing the mode already showing does nothing. Or, with Toggle with Go Live, a press while it shows goes back to Go Live',
 			options: [
 				{
 					id: 'mode',
@@ -119,24 +120,42 @@ export function UpdateActions(self: ModuleInstance): void {
 					],
 					default: 'golive',
 				},
+				{
+					id: 'toggle',
+					type: 'checkbox',
+					label: 'Toggle with Go Live',
+					tooltip:
+						'Pressed while this mode shows (set from anywhere: ZionWorx, a phone, another button), goes back to Go Live',
+					default: false,
+					isVisibleExpression: `$(options:mode) != 'golive'`,
+				},
 			],
-			callback: async ({ options }) => send(`mode/${options.mode}`, 'Output mode'),
+			callback: async ({ options }) => {
+				const showing = { logo: 'logo', blank: 'blank', hidetext: 'hideText', golive: 'goLive' }[options.mode]
+				const back = options.toggle && options.mode !== 'golive' && self.status?.live.mode === showing
+				return send(back ? 'mode/golive' : `mode/${options.mode}`, 'Output mode')
+			},
 		},
 		camera: {
-			name: 'Camera background',
+			name: 'Live Camera: on / off / toggle',
+			description: 'The live camera behind the item (the app’s Live Camera button)',
 			options: [
 				{
 					id: 'on',
 					type: 'dropdown',
-					label: 'Camera',
+					label: 'Live Camera',
 					choices: [
 						{ id: 'on', label: 'On' },
 						{ id: 'off', label: 'Off' },
+						{ id: 'toggle', label: 'Toggle' },
 					],
 					default: 'on',
 				},
 			],
-			callback: async ({ options }) => send(`camera/${options.on}`, 'Camera'),
+			callback: async ({ options }) => {
+				const on = options.on === 'toggle' ? !self.status?.live.camera : options.on === 'on'
+				return send(on ? 'camera/on' : 'camera/off', 'Live Camera')
+			},
 		},
 		media: {
 			name: 'Media transport',
