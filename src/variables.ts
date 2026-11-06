@@ -50,7 +50,8 @@ const cModeLabels: Record<ZwMode, string> = {
 	logo: 'Logo',
 	blank: 'Blank',
 	hideText: 'Hide Text',
-	goLive: 'Go Live',
+	// "Live", not "Go Live": the mode display is a status, and "Go Live" reads like a button to press.
+	goLive: 'Live',
 }
 
 export function clockText(ms: number, roundUp: boolean): string {
@@ -151,7 +152,7 @@ export function UpdateVariableDefinitions(self: ModuleInstance, itemCount = 0): 
 		live_slide_of: { name: 'Live slide as "3/9"' },
 		live_label: { name: 'Song section on screen ("V1", "C"…)' },
 		mode: { name: 'Output mode id (logo, blank, hideText, goLive)' },
-		mode_label: { name: 'Output mode (Logo, Blank, Hide Text, Go Live)' },
+		mode_label: { name: 'Output mode (Logo, Blank, Hide Text, Live)' },
 		camera: { name: 'Live Camera on' },
 		next_item: { name: 'Next item number (0: end of playlist)' },
 		next_title: { name: 'Next item title' },

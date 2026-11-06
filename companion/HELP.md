@@ -29,7 +29,9 @@ The quickest start: drag buttons from **Presets → ZionWorx**.
 - **Playlist items**: previous / next, the live and next titles, and items 1-20 showing their titles (lit while
   live, greyed out when the item is unavailable, blank past the end of the playlist).
 - **Output**: Logo, Blank, Hide Text and Go Live, lit while showing, and Live Camera (on, off). Also as
-  toggles: Logo, Blank or Hide Text that go back to Go Live when pressed again, and a Live Camera toggle.
+  toggles: Logo, Blank or Hide Text that go back to Go Live when pressed again, and a Live Camera toggle. Go Live
+  needs something live: until the first item goes live, a toggle pressed again stays where it is (Logo or Blank).
+  The output mode display reads "Live" while the content shows.
 - **Media**: Play / Pause with the time left (lit while playing), Restart, Rewind, Forward, and a time display.
   They work on a video or audio item, and on the audio attached to any item (a song's backing track, an image
   show's soundtrack).
@@ -84,7 +86,7 @@ connection's log; the button does nothing.
 | `live_item`, `live_title`, `live_type`                                                                     | The live item (number from 1, 0 = none)                                               |
 | `live_slide`, `live_slides`, `live_slide_of`                                                               | The live slide, the slide count, and both as "3/9"                                    |
 | `live_label`                                                                                               | The song section on screen ("V1", "C")                                                |
-| `mode`, `mode_label`                                                                                       | The output mode (`goLive`, "Go Live")                                                 |
+| `mode`, `mode_label`                                                                                       | The output mode (`goLive`, "Live")                                                    |
 | Live Camera on                                                                                             |
 | `next_item`, `next_title`, `next_type`                                                                     | The item Next would put live                                                          |
 | `item_1_title`, `item_2_title`, …                                                                          | Every playlist item's title (items 1-20 always exist, empty past the end)             |
